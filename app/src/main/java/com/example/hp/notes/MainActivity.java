@@ -1,6 +1,8 @@
 package com.example.hp.notes;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -14,10 +16,16 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
     static ArrayList<String> notes = new ArrayList<>();
+
+    static ArrayAdapter arrayAdapter;
+
+    static Set<String> set;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,10 +36,27 @@ public class MainActivity extends AppCompatActivity {
 
         ListView listView = (ListView)findViewById(R.id.listView);
 
-        notes.add("Example notes");
-        notes.add("this is tp ;)");
+        SharedPreferences sharedPreferences = this.getSharedPreferences("com.example.hp.notes", Context.MODE_PRIVATE);
 
-        ArrayAdapter arrayAdapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1,notes);
+        set = sharedPreferences.getStringSet("notes",null);
+
+        notes.clear();
+
+        if(set != null){
+
+            notes.addAll(set);
+
+        }else {
+
+            notes.add("Example Note");
+            set = new HashSet<String>();
+            set.addAll(notes);
+            sharedPreferences.edit().putStringSet("notes",set).apply();
+
+        }
+
+
+        arrayAdapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1,notes);
 
         listView.setAdapter(arrayAdapter);
 
