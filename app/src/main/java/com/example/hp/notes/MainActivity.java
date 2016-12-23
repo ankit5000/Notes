@@ -1,11 +1,13 @@
 package com.example.hp.notes;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -70,6 +72,49 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int pos, long l) {
+
+                new AlertDialog.Builder(MainActivity.this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle("Delete")
+                        .setMessage("Do you want to delete this note?")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+
+                                notes.remove(pos);
+
+                                SharedPreferences sharedPreferences = MainActivity.this.getSharedPreferences("com.example.hp.notes", Context.MODE_PRIVATE);
+
+                                if (set == null) {
+
+                                    set = new HashSet<String>();
+
+                                } else {
+
+                                    set.clear();
+
+                                }
+
+                                set.addAll(MainActivity.notes);
+                                sharedPreferences.edit().remove("notes").apply();
+                                sharedPreferences.edit().putStringSet("notes", set).apply();
+                                arrayAdapter.notifyDataSetChanged();
+
+                            }
+                        })
+                        .setNegativeButton("No", null)
+                        .show();
+
+
+                return  true;
+
+            }
+        });
+
     }
 
     @Override
@@ -87,7 +132,32 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.add) {
+
+            notes.add("");
+
+            SharedPreferences sharedPreferences = this.getSharedPreferences("com.example.hp.notes", Context.MODE_PRIVATE);
+
+            if(set == null){
+
+                set = new HashSet<String>();
+
+            }else {
+
+                set.clear();
+
+            }
+
+            set.addAll(MainActivity.notes);
+            arrayAdapter.notifyDataSetChanged();
+
+            sharedPreferences.edit().remove("notes").apply();
+            sharedPreferences.edit().putStringSet("notes",set).apply();
+
+            Intent i = new Intent(getApplicationContext(),Main2Activity.class);
+            i.putExtra("noteId",notes.size()-1);
+            startActivity(i);
+
             return true;
         }
 

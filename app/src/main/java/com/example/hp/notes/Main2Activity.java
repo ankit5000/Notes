@@ -66,6 +66,7 @@ public class Main2Activity extends AppCompatActivity implements TextWatcher {
         }
 
         MainActivity.set.addAll(MainActivity.notes);
+        sharedPreferences.edit().remove("notes").apply();
         sharedPreferences.edit().putStringSet("notes",MainActivity.set).apply();
 
     }
